@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-matcha: #517c38;
+  --color-matcha-dark: #41652c;
+  --color-matcha-ink: #41652c; /* matcha text on soft/tinted backgrounds */
+  --color-matcha-soft: #eef4ea;
+  --color-honey: #efa823;
+  --color-honey-soft: #fdf3dd;
+  --color-cream: #fbfbf9;
+  --color-surface: #ffffff;
+  --color-line: #e5e7eb;
+  --color-ink: #1f2937;
+  --color-muted: #6b7280;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Night mode: the whole UI is built from these tokens, so overriding them re-themes everything. */
+@layer base {
+  :root.dark {
+    color-scheme: dark;
+    --color-cream: #121512;
+    --color-surface: #1b1f1b;
+    --color-line: #2c332c;
+    --color-ink: #e8ece6;
+    --color-muted: #9aa59a;
+    --color-matcha: #5b8f41;
+    --color-matcha-ink: #a8d38c;
+    --color-matcha-soft: #223019;
+    --color-honey-soft: #3a2d10;
+    /* Tailwind palette colors used for errors and status badges */
+    --color-red-50: rgb(239 68 68 / 0.14);
+    --color-red-200: rgb(239 68 68 / 0.4);
+    --color-red-700: #f87171;
+    --color-amber-800: #fcd34d;
+    --color-amber-900: #fde68a;
+    --color-blue-50: rgb(59 130 246 / 0.16);
+    --color-blue-700: #93c5fd;
+    --color-gray-100: #2a2f2a;
+  }
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+  body {
+    @apply bg-cream text-ink antialiased;
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border bg-surface px-3 py-2 text-sm font-medium transition hover:bg-cream disabled:opacity-50;
+}
+
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-matcha px-3 py-2 text-sm font-semibold text-white transition hover:bg-matcha-dark disabled:opacity-50;
+}
+
+@utility btn-danger {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-surface px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-50;
+}
+
+@utility card {
+  @apply rounded-xl border bg-surface;
+}
+
+@utility input {
+  @apply w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-matcha focus:ring-2 focus:ring-matcha/20;
+}
+
+@utility label {
+  @apply mb-1 block text-sm font-medium;
+}

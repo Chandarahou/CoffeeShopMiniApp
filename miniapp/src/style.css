@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-matcha: #517c38;
+  --color-matcha-dark: #41652c;
+  --color-matcha-soft: #eef4ea;
+  --color-honey: #efa823;
+  --color-honey-soft: #fdf3dd;
+  --color-cream: #fbfbf9;
+  --color-surface: #ffffff;
+  --color-line: #e5e7eb;
+  --color-ink: #1f2937;
+  --color-muted: #6b7280;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+  body {
+    @apply bg-cream text-ink antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-matcha px-4 py-3 font-semibold text-white transition active:bg-matcha-dark disabled:opacity-50;
+}
+
+@utility card {
+  @apply rounded-2xl border bg-surface;
+}

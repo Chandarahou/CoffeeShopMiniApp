@@ -1,0 +1,20 @@
+{
+  "name": "weeee-cafe",
+  "private": true,
+  "workspaces": [
+    "server",
+    "miniapp",
+    "admin"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,miniapp,admin -c green,yellow,blue \"npm run dev -w server\" \"npm run dev -w miniapp\" \"npm run dev -w admin\"",
+    "dev:server": "npm run dev -w server",
+    "dev:miniapp": "npm run dev -w miniapp",
+    "dev:admin": "npm run dev -w admin",
+    "build": "npm run build -w miniapp && npm run build -w admin",
+    "seed": "npm run seed -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

@@ -1,0 +1,9 @@
+# Cloudflare Pages response headers.
+# No X-Frame-Options here: Telegram Web and Desktop load the Mini App inside a frame.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,23 @@
+import mongoose from 'mongoose';
+import { config } from './config.js';
+import { connectDb } from './db.js';
+import { createApp } from './app.js';
+import { startBot, stopBot } from './services/bot.js';
+
+await connectDb();
+
+const server = createApp().listen(config.port, () => {
+  console.log(`[api] listening on http://localhost:${config.port}`);
+  if (config.allowDevAuth) console.warn('[api] ALLOW_DEV_AUTH is on — never enable this in production');
+});
+
+await startBot();
+
+async function shutdown() {
+  await stopBot();
+  server.close();
+  await mongoose.disconnect();
+  process.exit(0);
+}
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
