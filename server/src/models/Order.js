@@ -46,13 +46,19 @@ const historySchema = new Schema(
 const orderSchema = new Schema(
   {
     orderNumber: { type: String, required: true, unique: true },
-    customer: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    // Orders placed in Telegram always have a customer. Counter orders created by staff for a
+    // walk-in don't: they carry just a name (customerSnapshot.firstName) and no Telegram identity.
+    customer: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     customerSnapshot: {
-      telegramUserId: { type: String, required: true, index: true },
+      telegramUserId: { type: String, index: true },
       telegramUsername: { type: String, index: true },
       firstName: String,
       lastName: String,
     },
+    // Where the order came from. Orders saved before this field existed are Telegram orders.
+    source: { type: String, enum: ['telegram', 'staff'], default: 'telegram' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'Admin' },
+    createdByName: String,
     items: { type: [orderItemSchema], required: true },
     subtotal: { type: Number, required: true },
     discount: { type: Number, default: 0 },

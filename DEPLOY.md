@@ -19,15 +19,26 @@ Replace the example names below (`weeee-api`, `weeee-miniapp`, `weeee-admin`) wi
 4. **Connect → Drivers:** copy the connection string, and add the database name before the `?`:
    `mongodb+srv://USER:PASS@cluster0.xxxxx.mongodb.net/weeee-cafe?retryWrites=true&w=majority`
 
-**Seed it from your laptop** (creates the admin accounts and the sample menu):
+**Seed it from your laptop** (creates the admin accounts and the sample menu). Use **single quotes** around every value: double quotes let your shell rewrite `$` and `!` inside a password, and you'd end up with a different password than you typed.
 
 ```sh
-MONGODB_URI="mongodb+srv://…/weeee-cafe?…" \
-SEED_ADMIN_EMAIL="you@yourcafe.com" SEED_ADMIN_PASSWORD="a-long-password" \
+MONGODB_URI='mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/weeee-cafe?retryWrites=true&w=majority' \
+SEED_ADMIN_EMAIL='you@yourcafe.com' \
+SEED_ADMIN_PASSWORD='a-long-password' \
 npm run seed
 ```
 
 Variables on the command line override `server/.env`, so this writes to Atlas, not your local database.
+
+**Keep the database name in the string** (`/weeee-cafe` before the `?`). Without it, MongoDB silently uses a database called `test`. Use the exact same string on Render, or the seed and the server will look in different places.
+
+**Can't log in? Reset the password.** The seed never overwrites an existing account, so to change a password later use the reset command. It asks for the new password at a hidden prompt, so the shell can't mangle it:
+
+```sh
+MONGODB_URI='mongodb+srv://…/weeee-cafe?…' ADMIN_EMAIL='you@yourcafe.com' npm run reset-admin
+```
+
+It prints the database it changed. If it says it can't find the email, it lists the accounts that exist.
 
 ## 2. API + bot — Render
 
@@ -92,6 +103,7 @@ If you later add custom domains, add them to `CORS_ORIGINS` and update `MINI_APP
 
 | Symptom | Likely cause |
 | --- | --- |
+| Admin login says "Invalid email or password" | The account is missing, or the password was altered by shell quoting when seeding. Check the `admins` collection in Atlas, then run `npm run reset-admin` (step 1). Also make sure the database name is the same everywhere. |
 | Admin or Mini App shows "Network error" | `VITE_API_URL` is wrong or wasn't set before the build, or the API is waking from sleep (wait a minute and retry). |
 | Browser console shows a CORS error | The site's exact address (with `https://`, no trailing slash) is missing from `CORS_ORIGINS`. |
 | Mini App says "Could not verify Telegram data" | `TELEGRAM_BOT_TOKEN` on Render doesn't belong to the bot you opened the app from. |

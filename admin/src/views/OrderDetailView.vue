@@ -70,8 +70,10 @@ const historyLabel = (h) =>
         <h2 class="mb-2 font-semibold">Customer</h2>
         <p v-if="order.customerSnapshot.telegramUsername">@{{ order.customerSnapshot.telegramUsername }}</p>
         <p>{{ order.customerSnapshot.firstName }} {{ order.customerSnapshot.lastName }}</p>
-        <p class="text-muted">Telegram ID: {{ order.customerSnapshot.telegramUserId }}</p>
-        <RouterLink :to="`/customers/${order.customer}`" class="mt-2 inline-block font-medium text-matcha">View customer →</RouterLink>
+        <p v-if="order.customerSnapshot.telegramUserId" class="text-muted">Telegram ID: {{ order.customerSnapshot.telegramUserId }}</p>
+        <p v-else class="text-muted">Walk-in customer (no Telegram account)</p>
+        <RouterLink v-if="order.customer" :to="`/customers/${order.customer}`" class="mt-2 inline-block font-medium text-matcha">View customer →</RouterLink>
+        <p v-if="order.source === 'staff'" class="mt-2 text-xs text-muted">Counter order entered by {{ order.createdByName }}</p>
       </section>
 
       <section class="card p-5 text-sm">

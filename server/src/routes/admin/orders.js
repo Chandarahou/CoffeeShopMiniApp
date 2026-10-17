@@ -1,6 +1,11 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
 import { z } from 'zod';
 import { Order } from '../../models/Order.js';
+import { User } from '../../models/User.js';
+import { nextSequence } from '../../models/Counter.js';
+import { priceItems } from '../../services/pricing.js';
+import { itemsSchema } from '../../lib/cartSchema.js';
 import { escapeRegex } from '../../lib/escapeRegex.js';
 import { badRequest, notFound } from '../../lib/errors.js';
 import {
@@ -12,7 +17,7 @@ import {
   canTransitionOrder,
   canTransitionPayment,
 } from '../../services/orderWorkflow.js';
-import { notifyOrderStatus } from '../../services/bot.js';
+import { notifyOrderPlaced, notifyOrderStatus } from '../../services/bot.js';
 
 export const adminOrdersRouter = Router();
 
@@ -68,6 +73,73 @@ adminOrdersRouter.get('/', async (req, res) => {
   ]);
 
   res.json({ orders: orders.map(withActions), total, page: query.page, limit: query.limit });
+});
+
+const createBody = z.object({
+  clientOrderId: z.uuid(), // idempotency key, so a double click can't create two orders
+  items: itemsSchema,
+  customerId: z.string().optional(), // an existing Telegram customer; omit for a walk-in
+  walkInName: z.string().trim().max(60).optional(),
+  note: z.string().trim().max(300).optional(),
+  paid: z.boolean().default(false), // cash collected at the time of ordering
+});
+
+// Counter order: staff enter an order on behalf of someone standing at the till.
+adminOrdersRouter.post('/', async (req, res) => {
+  const body = createBody.parse(req.body);
+
+  let customer = null;
+  if (body.customerId) {
+    if (!mongoose.isValidObjectId(body.customerId)) throw badRequest('Invalid customer');
+    customer = await User.findById(body.customerId);
+    if (!customer) throw badRequest('Customer not found');
+  }
+  const customerKey = customer?._id ?? null;
+
+  const existing = await Order.findOne({ customer: customerKey, clientOrderId: body.clientOrderId }).lean();
+  if (existing) return res.status(200).json(withActions(existing));
+
+  // Same server-side pricing and availability checks as customer orders
+  const priced = await priceItems(body.items);
+  const seq = await nextSequence('order');
+
+  const order = new Order({
+    orderNumber: `ORD-${seq}`,
+    customer: customerKey,
+    customerSnapshot: customer
+      ? {
+          telegramUserId: customer.telegramUserId,
+          telegramUsername: customer.telegramUsername,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+        }
+      : { firstName: body.walkInName || 'Walk-in' },
+    source: 'staff',
+    createdBy: req.admin._id,
+    createdByName: req.admin.name,
+    ...priced,
+    note: body.note,
+    clientOrderId: body.clientOrderId,
+  });
+
+  // Staff took this order in person, so it starts accepted. Payment is only recorded
+  // if they actually collected the cash now; otherwise it stays unpaid like any other order.
+  applyOrderStatus(order, 'confirmed', req.admin, 'Counter order created by staff');
+  if (body.paid) applyPaymentStatus(order, 'paid', req.admin, 'Paid at the counter when ordering');
+
+  try {
+    await order.save();
+  } catch (err) {
+    // Lost a race with a concurrent identical submission
+    if (err?.code === 11000 && err.keyPattern?.clientOrderId) {
+      const dup = await Order.findOne({ customer: customerKey, clientOrderId: body.clientOrderId }).lean();
+      return res.status(200).json(withActions(dup));
+    }
+    throw err;
+  }
+
+  notifyOrderPlaced(order); // no-op for walk-ins (no Telegram ID)
+  res.status(201).json(withActions(order.toObject()));
 });
 
 adminOrdersRouter.get('/:id', async (req, res) => {

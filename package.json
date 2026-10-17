@@ -12,7 +12,8 @@
     "dev:miniapp": "npm run dev -w miniapp",
     "dev:admin": "npm run dev -w admin",
     "build": "npm run build -w miniapp && npm run build -w admin",
-    "seed": "npm run seed -w server"
+    "seed": "npm run seed -w server",
+    "reset-admin": "npm run reset-admin -w server"
   },
   "devDependencies": {
     "concurrently": "^10.0.6"

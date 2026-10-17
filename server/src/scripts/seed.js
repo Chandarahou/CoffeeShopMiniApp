@@ -94,7 +94,7 @@ await connectDb();
 
 // Accounts created on first run. Existing accounts are never modified.
 const ADMINS = [
-  { email: 'super@admin', name: 'Super Admin', role: 'super_admin', password: 'Lolz@7777' },
+  { email: 'super@admin', name: 'Super Admin', role: 'super_admin', password: 'Lolz@8888' },
   { email: process.env.SEED_ADMIN_EMAIL, name: 'Owner', role: 'owner', password: process.env.SEED_ADMIN_PASSWORD },
 ];
 
