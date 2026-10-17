@@ -10,6 +10,7 @@ import { notifyOrderPlaced } from '../services/bot.js';
 import { HttpError, notFound, unauthorized } from '../lib/errors.js';
 import { requireCustomer } from '../middleware/auth.js';
 import { shopDayRange } from '../lib/time.js';
+import { itemsSchema } from '../lib/cartSchema.js';
 
 const OPEN_STATUSES = ['pending', 'confirmed', 'preparing', 'ready'];
 const MAX_OPEN_ORDERS = 5;
@@ -27,17 +28,6 @@ export const ordersRouter = Router();
 ordersRouter.use(requireCustomer);
 
 const placeOrderLimiter = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false });
-
-const itemsSchema = z
-  .array(
-    z.object({
-      productId: z.string(),
-      quantity: z.number().int().min(1).max(50),
-      selections: z.record(z.string(), z.union([z.string(), z.array(z.string()).max(20)])).optional(),
-    }),
-  )
-  .min(1)
-  .max(50);
 
 const placeOrderBody = z.object({
   clientOrderId: z.uuid(),

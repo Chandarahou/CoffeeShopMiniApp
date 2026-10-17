@@ -12,6 +12,7 @@ export const router = createRouter({
       children: [
         { path: '', name: 'dashboard', component: () => import('./views/DashboardView.vue') },
         { path: 'orders', name: 'orders', component: () => import('./views/OrdersView.vue') },
+        { path: 'orders/new', name: 'order-new', component: () => import('./views/OrderFormView.vue') },
         { path: 'orders/:id', name: 'order', component: () => import('./views/OrderDetailView.vue') },
         { path: 'products', name: 'products', component: () => import('./views/ProductsView.vue') },
         { path: 'products/new', name: 'product-new', component: () => import('./views/ProductFormView.vue') },

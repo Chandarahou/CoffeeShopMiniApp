@@ -53,7 +53,8 @@ export async function stopBot() {
 }
 
 async function send(telegramUserId, text) {
-  if (!bot) return;
+  // Counter orders for walk-in customers have no Telegram ID, so there's nobody to message
+  if (!bot || !telegramUserId) return;
   try {
     await bot.api.sendMessage(telegramUserId, text, { parse_mode: 'HTML' });
   } catch (err) {
@@ -76,7 +77,9 @@ export function notifyOrderPlaced(order) {
     order.customerSnapshot.telegramUserId,
     `🧾 Order <b>#${order.orderNumber}</b> received!\n` +
       `Total: <b>${formatCents(order.total)}</b>\n` +
-      'Please pay in cash at the counter when collecting your order.',
+      (order.paymentStatus === 'paid'
+        ? 'Payment received, thank you!'
+        : 'Please pay in cash at the counter when collecting your order.'),
   );
 }
 

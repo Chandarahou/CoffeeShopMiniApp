@@ -6,7 +6,8 @@
     "dev": "node --watch --env-file-if-exists=.env src/index.js",
     "start": "node --env-file-if-exists=.env src/index.js",
     "seed": "node --env-file-if-exists=.env src/scripts/seed.js",
-    "test": "node --test"
+    "test": "node --test",
+    "reset-admin": "node --env-file-if-exists=.env src/scripts/reset-admin.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

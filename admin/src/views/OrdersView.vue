@@ -1,7 +1,7 @@
 <script setup>
 import { onUnmounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Search, RefreshCw } from 'lucide-vue-next';
+import { Plus, RefreshCw, Search } from 'lucide-vue-next';
 import StatusBadge from '../components/StatusBadge.vue';
 import OrderActions from '../components/OrderActions.vue';
 import PaginationBar from '../components/PaginationBar.vue';
@@ -73,7 +73,10 @@ onUnmounted(() => clearInterval(timer));
 <template>
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold">Orders</h1>
-    <button class="btn" :disabled="loading" @click="load"><RefreshCw class="size-4" :class="{ 'animate-spin': loading }" /> Refresh</button>
+    <div class="flex items-center gap-2">
+      <RouterLink to="/orders/new" class="btn-primary"><Plus class="size-4" /> New order</RouterLink>
+      <button class="btn" :disabled="loading" @click="load"><RefreshCw class="size-4" :class="{ 'animate-spin': loading }" /> Refresh</button>
+    </div>
   </div>
 
   <form class="mt-4 grid gap-2 md:grid-cols-[1fr_auto_auto_auto]" @submit.prevent="apply()">
@@ -101,7 +104,10 @@ onUnmounted(() => clearInterval(timer));
         <div>
           <RouterLink :to="`/orders/${order._id}`" class="text-lg font-bold hover:text-matcha">#{{ order.orderNumber }}</RouterLink>
           <p class="text-sm text-muted">
-            {{ displayName(order.customerSnapshot) }} · ID {{ order.customerSnapshot.telegramUserId }} · {{ formatDateTime(order.createdAt) }}
+            {{ displayName(order.customerSnapshot) }}
+            <template v-if="order.customerSnapshot.telegramUserId">· ID {{ order.customerSnapshot.telegramUserId }}</template>
+            · {{ formatDateTime(order.createdAt) }}
+            <span v-if="order.source === 'staff'" class="ml-1 rounded-full bg-honey-soft px-2 py-0.5 text-[11px] font-bold text-amber-800">Counter</span>
           </p>
         </div>
         <div class="flex items-center gap-2">

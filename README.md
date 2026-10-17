@@ -25,6 +25,11 @@ Admin login: the `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` from `server/.env`. 
 - **In a browser:** with `ALLOW_DEV_AUTH=true` (non-production only) the Mini App logs in as a fake dev user.
 - **In Telegram:** create a bot with @BotFather and set `TELEGRAM_BOT_TOKEN`. Expose the Mini App over HTTPS (e.g. `cloudflared tunnel --url http://localhost:5173`), set `MINI_APP_URL` to that URL and restart the server. Then send `/start` to the bot.
 
+## Documentation
+
+- [docs/TECHNOLOGY.md](docs/TECHNOLOGY.md): how the system works, how the apps and server communicate, and how development differs from production.
+- [DEPLOY.md](DEPLOY.md): step-by-step deployment.
+
 ## Deploying
 
 See [DEPLOY.md](DEPLOY.md) for the step-by-step guide: MongoDB Atlas, then Render (`render.yaml`), then Cloudflare Pages.
