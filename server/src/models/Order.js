@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ORDER_STATUSES, PAYMENT_STATUSES } from '../services/orderWorkflow.js';
+import { ORDER_STATUSES, PAYMENT_METHODS, PAYMENT_STATUSES } from '../services/orderWorkflow.js';
 
 const { Schema } = mongoose;
 
@@ -12,6 +12,37 @@ const selectedOptionSchema = new Schema(
     choiceId: Schema.Types.ObjectId,
     label: String,
     priceDelta: Number,
+  },
+  { _id: false },
+);
+
+// The automatic payment checks for one QR code (see services/khqrVerification.js):
+//   pending   – checks are scheduled or running
+//   paid      – Bakong confirmed the payment and the order was marked paid
+//   not_found – all checks ran and Bakong never saw a payment
+//   stopped   – checks ended early (order paid by staff, daily limit reached, token problem…)
+//   mismatch  – Bakong saw a payment, but its amount or currency didn't match the order
+//   disabled  – no Bakong token configured, so staff confirm the payment by hand
+export const KHQR_CHECK_STATUSES = ['pending', 'paid', 'not_found', 'stopped', 'mismatch', 'disabled'];
+
+// One KHQR payment request. A new one is issued when the previous one expires. All are kept,
+// because a customer could pay an older code just before it expired.
+const khqrPaymentSchema = new Schema(
+  {
+    md5: { type: String, required: true },
+    qrString: { type: String, required: true },
+    amount: { type: Number, required: true }, // cents
+    currency: { type: String, default: 'USD' },
+    shownAt: { type: Date, required: true }, // when the customer was shown the code
+    expiresAt: { type: Date, required: true },
+    createdAt: { type: Date, default: Date.now },
+
+    checkStatus: { type: String, enum: KHQR_CHECK_STATUSES, default: 'pending' },
+    checksDone: { type: Number, default: 0 },
+    lastCheckedAt: Date,
+    checkNote: String, // why checks stopped, or what Bakong last said
+    bakongHash: String, // Bakong's transaction hash once paid
+    verifiedAt: Date,
   },
   { _id: false },
 );
@@ -66,7 +97,8 @@ const orderSchema = new Schema(
     total: { type: Number, required: true },
     note: { type: String, maxlength: 300 },
 
-    paymentMethod: { type: String, enum: ['cash_at_counter'], default: 'cash_at_counter' },
+    paymentMethod: { type: String, enum: PAYMENT_METHODS, default: 'cash_at_counter' },
+    khqrPayments: { type: [khqrPaymentSchema], default: [] },
     paymentStatus: { type: String, enum: PAYMENT_STATUSES, default: 'unpaid', index: true },
     orderStatus: { type: String, enum: ORDER_STATUSES, default: 'pending', index: true },
 
@@ -88,5 +120,7 @@ const orderSchema = new Schema(
 
 orderSchema.index({ customer: 1, clientOrderId: 1 }, { unique: true });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ 'khqrPayments.md5': 1 }, { sparse: true });
+orderSchema.index({ 'khqrPayments.checkStatus': 1 }, { sparse: true });
 
 export const Order = mongoose.model('Order', orderSchema);

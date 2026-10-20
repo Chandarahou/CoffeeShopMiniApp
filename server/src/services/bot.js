@@ -79,7 +79,16 @@ export function notifyOrderPlaced(order) {
       `Total: <b>${formatCents(order.total)}</b>\n` +
       (order.paymentStatus === 'paid'
         ? 'Payment received, thank you!'
-        : 'Please pay in cash at the counter when collecting your order.'),
+        : order.paymentMethod === 'khqr'
+          ? 'Scan the KHQR code in the app to pay, or pay in cash at the counter.'
+          : 'Please pay in cash at the counter when collecting your order.'),
+  );
+}
+
+export function notifyPaymentReceived(order) {
+  return send(
+    order.customerSnapshot.telegramUserId,
+    `✅ Payment of <b>${formatCents(order.total)}</b> received for order <b>#${order.orderNumber}</b>. Thank you!`,
   );
 }
 

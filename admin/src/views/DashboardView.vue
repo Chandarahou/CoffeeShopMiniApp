@@ -69,6 +69,18 @@ onUnmounted(() => clearInterval(timer));
       </div>
     </div>
 
+    <section v-if="summary.bakong" class="card mt-4 flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
+      <div>
+        <p class="font-semibold">KHQR automatic checks</p>
+        <p v-if="summary.bakong.automaticChecks" class="text-muted">On — payments are confirmed with Bakong</p>
+        <p v-else class="text-red-700">Off — {{ summary.bakong.disabledReason }}. Confirm KHQR payments by hand.</p>
+      </div>
+      <p class="tabular-nums">
+        <span class="text-lg font-bold">{{ summary.bakong.requestsUsed }}</span>
+        <span class="text-muted"> / {{ summary.bakong.dailyLimit }} Bakong requests today</span>
+      </p>
+    </section>
+
     <section class="card mt-6 p-4">
       <h2 class="font-semibold">Popular products <span class="text-sm font-normal text-muted">· last 30 days</span></h2>
       <p v-if="!summary.popularProducts.length" class="mt-3 text-sm text-muted">No orders yet.</p>

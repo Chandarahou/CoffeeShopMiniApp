@@ -32,3 +32,11 @@ services:
         value: "420"
       - key: BOT_POLLING
         value: "true"
+      - key: KHQR_BAKONG_ACCOUNT_ID
+        sync: false # e.g. yourname@aclb — leave empty for cash only
+      - key: KHQR_MERCHANT_NAME
+        value: Weeee Cafe
+      - key: KHQR_MERCHANT_CITY
+        value: Phnom Penh
+      - key: KHQR_BAKONG_TOKEN
+        sync: false # Bakong Open API token — confirms KHQR payments automatically

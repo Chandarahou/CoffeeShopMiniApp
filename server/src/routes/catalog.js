@@ -3,9 +3,15 @@ import mongoose from 'mongoose';
 import { Category } from '../models/Category.js';
 import { Product } from '../models/Product.js';
 import { notFound } from '../lib/errors.js';
+import { khqrEnabled } from '../services/khqr.js';
 
 // Public, read-only menu endpoints for the Mini App
 export const catalogRouter = Router();
+
+// Which payment options checkout should offer
+catalogRouter.get('/payment-methods', (_req, res) => {
+  res.json({ methods: ['cash_at_counter', ...(khqrEnabled() ? ['khqr'] : [])] });
+});
 
 catalogRouter.get('/categories', async (_req, res) => {
   const categories = await Category.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean();

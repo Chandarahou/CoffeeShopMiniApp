@@ -19,6 +19,40 @@ onMounted(async () => {
   }
 });
 
+// How each QR code's automatic Bakong checks went (see server/src/services/khqrVerification.js)
+function describeKhqrCheck(payment) {
+  const checks = `${payment.checksDone || 0} of 6 checks`;
+  if (payment.checkStatus === 'paid') {
+    return `Paid — confirmed by Bakong (${String(payment.bakongHash || '').slice(0, 8)})`;
+  }
+  if (payment.checkStatus === 'pending') {
+    return `Checking with Bakong… (${checks} done)`;
+  }
+  if (payment.checkStatus === 'not_found') {
+    return `Not paid — Bakong found no payment (${checks})`;
+  }
+  if (payment.checkStatus === 'mismatch') {
+    return 'Bakong reported a different amount — check by hand';
+  }
+  if (payment.checkStatus === 'stopped') {
+    return `Checks stopped after ${checks}`;
+  }
+  if (payment.checkStatus === 'disabled') {
+    return 'Not checked automatically — confirm by hand';
+  }
+  return 'Created before automatic checks were added';
+}
+
+function khqrCheckTone(payment) {
+  if (payment.checkStatus === 'paid') {
+    return 'text-matcha-ink font-medium';
+  }
+  if (payment.checkStatus === 'mismatch') {
+    return 'text-red-700 font-medium';
+  }
+  return 'text-muted';
+}
+
 const historyLabel = (h) =>
   h.type === 'payment_status'
     ? `Payment: ${PAYMENT_STATUS_LABELS[h.from]} → ${PAYMENT_STATUS_LABELS[h.to]}`
@@ -79,6 +113,20 @@ const historyLabel = (h) =>
       <section class="card p-5 text-sm">
         <h2 class="mb-2 font-semibold">Payment</h2>
         <p>{{ PAYMENT_METHOD_LABELS[order.paymentMethod] }}</p>
+        <template v-if="order.paymentMethod === 'khqr'">
+          <p v-if="!order.khqrPayments || order.khqrPayments.length === 0" class="text-muted">The customer hasn't opened the QR code yet.</p>
+          <ol v-else class="mt-2 space-y-2">
+            <li v-for="(payment, index) in order.khqrPayments" :key="payment.md5" class="rounded-lg border p-2">
+              <p class="font-medium">QR code {{ index + 1 }} · shown {{ formatDateTime(payment.shownAt || payment.createdAt) }}</p>
+              <p :class="khqrCheckTone(payment)">{{ describeKhqrCheck(payment) }}</p>
+              <p v-if="payment.checkNote && payment.checkStatus !== 'paid'" class="text-xs text-muted">{{ payment.checkNote }}</p>
+            </li>
+          </ol>
+          <p v-if="order.paymentStatus === 'unpaid'" class="mt-2 rounded-lg bg-honey-soft p-2 text-xs text-amber-900">
+            Bakong payments are confirmed automatically. If the customer shows a receipt but the order isn't marked paid,
+            check that the money arrived in your Bakong account before marking it paid by hand.
+          </p>
+        </template>
         <p v-if="order.paidAt" class="text-muted">Paid {{ formatDateTime(order.paidAt) }}</p>
       </section>
 
