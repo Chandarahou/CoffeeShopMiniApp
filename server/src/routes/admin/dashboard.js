@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { Order } from '../../models/Order.js';
 import { shopDayRange } from '../../lib/time.js';
+import { khqrEnabled } from '../../services/khqr.js';
+import { bakongUsageToday } from '../../services/khqrVerification.js';
 
 export const adminDashboardRouter = Router();
 
@@ -39,6 +41,11 @@ adminDashboardRouter.get('/summary', async (_req, res) => {
     ]),
   ]);
 
+  let bakong = null;
+  if (khqrEnabled()) {
+    bakong = await bakongUsageToday();
+  }
+
   const byStatus = Object.fromEntries(statusCounts.map((s) => [s._id, s.count]));
   res.json({
     today: {
@@ -54,6 +61,7 @@ adminDashboardRouter.get('/summary', async (_req, res) => {
     },
     allTime: { salesAmount: salesAllTime[0]?.amount ?? 0, paidOrders: salesAllTime[0]?.count ?? 0 },
     unpaid: { count: unpaid[0]?.count ?? 0, amount: unpaid[0]?.amount ?? 0 },
+    bakong: bakong,
     popularProducts: popular.map((p) => ({ name: p._id, quantity: p.quantity, revenue: p.revenue })),
   });
 });

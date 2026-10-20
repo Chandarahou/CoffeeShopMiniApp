@@ -51,6 +51,10 @@ It prints the database it changed. If it says it can't find the email, it lists 
    | `TELEGRAM_BOT_TOKEN` | Your **live** bot's token |
    | `MINI_APP_URL` | Leave empty for now (set in step 4) |
    | `CORS_ORIGINS` | Leave empty for now (set in step 4) |
+   | `KHQR_BAKONG_ACCOUNT_ID` | Your Bakong account ID, such as `yourname@aclb`. Leave empty to offer cash only. |
+   | `KHQR_BAKONG_TOKEN` | Your Bakong Open API token. It confirms KHQR payments automatically. Leave empty and staff confirm them by hand. |
+
+   `KHQR_MERCHANT_NAME` and `KHQR_MERCHANT_CITY` are prefilled. The merchant name appears in the customer's bank app and must be 25 characters or fewer. If the account ID is invalid, the server logs `[khqr] configuration rejected` and checkout offers cash only.
 
    `JWT_SECRET` is generated for you. `NODE_ENV=production` is already set, which turns off the dev login.
 3. When the deploy finishes, open `https://weeee-api.onrender.com/api/health`. It should show `{"ok":true}`.
@@ -98,6 +102,11 @@ If you later add custom domains, add them to `CORS_ORIGINS` and update `MINI_APP
 3. Place an order. You should get a "received" message from the bot.
 4. In the admin, confirm the order and mark it ready. You should get the "ready" message.
 5. Mark the payment as received and check that the dashboard's sales figures go up.
+6. If KHQR is set up: place another order, choose **KHQR**, and pay a small amount by scanning the code with a bank app. Within about 10 seconds of paying, the popup should switch to **Payment received** and the order should show as paid in the admin. The admin dashboard shows how many of today's 100 Bakong requests have been used.
+
+**Bakong limits to know:** Bakong allows 100 requests per day. Each QR code uses at most 6 (checks at 10, 20, 30, 60, 90 and 120 seconds after it is shown, stopping as soon as it's paid), so at least 16 QR codes a day can be checked automatically (more when customers pay quickly, because checking stops at the first confirmation). After that, the server stops checking and staff confirm payments by hand until the next day. A QR code expires 120 seconds after it is shown, and each order can show at most 3 codes.
+
+**Token renewal:** Bakong tokens last 90 days. The server log warns 14 days before yours expires. Renew it on the Bakong Open API portal and update `KHQR_BAKONG_TOKEN` on Render.
 
 ## Troubleshooting
 

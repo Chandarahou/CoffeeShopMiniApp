@@ -3,8 +3,12 @@ import { config } from './config.js';
 import { connectDb } from './db.js';
 import { createApp } from './app.js';
 import { startBot, stopBot } from './services/bot.js';
+import { initKhqr } from './services/khqr.js';
+import { initKhqrVerification, stopKhqrVerification } from './services/khqrVerification.js';
 
 await connectDb();
+initKhqr();
+initKhqrVerification();
 
 const server = createApp().listen(config.port, () => {
   console.log(`[api] listening on http://localhost:${config.port}`);
@@ -14,6 +18,7 @@ const server = createApp().listen(config.port, () => {
 await startBot();
 
 async function shutdown() {
+  stopKhqrVerification();
   await stopBot();
   server.close();
   await mongoose.disconnect();

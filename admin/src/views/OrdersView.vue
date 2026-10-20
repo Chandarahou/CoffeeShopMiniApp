@@ -108,6 +108,7 @@ onUnmounted(() => clearInterval(timer));
             <template v-if="order.customerSnapshot.telegramUserId">· ID {{ order.customerSnapshot.telegramUserId }}</template>
             · {{ formatDateTime(order.createdAt) }}
             <span v-if="order.source === 'staff'" class="ml-1 rounded-full bg-honey-soft px-2 py-0.5 text-[11px] font-bold text-amber-800">Counter</span>
+            <span v-if="order.paymentMethod === 'khqr'" class="ml-1 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-bold text-red-700">KHQR</span>
           </p>
         </div>
         <div class="flex items-center gap-2">

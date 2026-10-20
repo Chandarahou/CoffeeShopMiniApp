@@ -14,7 +14,7 @@ export const ORDER_STATUS_LABELS = {
 
 export const PAYMENT_STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', refunded: 'Refunded' };
 
-export const PAYMENT_METHOD_LABELS = { cash_at_counter: 'Cash at Counter' };
+export const PAYMENT_METHOD_LABELS = { cash_at_counter: 'Cash at Counter', khqr: 'KHQR' };
 
 export function displayName(customer) {
   return customer?.telegramUsername

@@ -1,5 +1,6 @@
 export const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'];
 export const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded'];
+export const PAYMENT_METHODS = ['cash_at_counter', 'khqr'];
 
 // Order status and payment status are deliberately independent: completing an
 // order never marks it paid, and payment is only recorded when staff confirm cash.

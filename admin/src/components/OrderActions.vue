@@ -27,7 +27,12 @@ const PAYMENT_ACTIONS = {
     label: 'Mark Payment Received',
     confirm: (o) => ({
       title: 'Payment received?',
-      html: `Confirm you received <b>${formatMoney(o.total)}</b> in cash for order <b>#${o.orderNumber}</b>.`,
+      // KHQR payments are normally confirmed by Bakong automatically; marking one paid by hand
+      // should only happen after staff have seen the money arrive
+      html:
+        o.paymentMethod === 'khqr'
+          ? `KHQR payments are usually confirmed automatically. Only continue if you can see <b>${formatMoney(o.total)}</b> for order <b>#${o.orderNumber}</b> in your Bakong or bank app.`
+          : `Confirm you received <b>${formatMoney(o.total)}</b> in cash for order <b>#${o.orderNumber}</b>.`,
       confirmText: 'Yes, payment received',
     }),
   },
