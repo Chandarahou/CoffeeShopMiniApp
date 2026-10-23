@@ -17,6 +17,7 @@ export const router = createRouter({
         { path: 'products', name: 'products', component: () => import('./views/ProductsView.vue') },
         { path: 'products/new', name: 'product-new', component: () => import('./views/ProductFormView.vue') },
         { path: 'products/:id', name: 'product-edit', component: () => import('./views/ProductFormView.vue') },
+        { path: 'images', name: 'images', component: () => import('./views/ImagesView.vue') },
         { path: 'categories', name: 'categories', component: () => import('./views/CategoriesView.vue') },
         { path: 'customers', name: 'customers', component: () => import('./views/CustomersView.vue') },
         { path: 'account', name: 'account', component: () => import('./views/AccountView.vue') },

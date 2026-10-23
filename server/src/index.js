@@ -4,9 +4,11 @@ import { connectDb } from './db.js';
 import { createApp } from './app.js';
 import { startBot, stopBot } from './services/bot.js';
 import { initKhqr } from './services/khqr.js';
+import { initImageStorage } from './services/imageStorage.js';
 import { initKhqrVerification, stopKhqrVerification } from './services/khqrVerification.js';
 
 await connectDb();
+initImageStorage();
 initKhqr();
 initKhqrVerification();
 

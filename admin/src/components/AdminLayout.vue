@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { LayoutDashboard, Receipt, Package, Tags, Users, LogOut, Menu, X, KeyRound } from 'lucide-vue-next';
+import { LayoutDashboard, Receipt, Package, Tags, Users, LogOut, Menu, X, KeyRound, Images } from 'lucide-vue-next';
 import ThemeToggle from './ThemeToggle.vue';
 import { isDark } from '../lib/theme.js';
 import { useAuthStore } from '../stores/auth.js';
@@ -16,6 +16,7 @@ const nav = [
   { to: '/orders', label: 'Orders', icon: Receipt },
   { to: '/products', label: 'Products', icon: Package },
   { to: '/categories', label: 'Categories', icon: Tags },
+  { to: '/images', label: 'Images', icon: Images },
   { to: '/customers', label: 'Customers', icon: Users },
 ];
 

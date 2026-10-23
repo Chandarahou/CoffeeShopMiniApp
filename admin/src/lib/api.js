@@ -42,3 +42,42 @@ export async function api(path, { method = 'GET', body, query } = {}) {
   }
   return data;
 }
+
+/**
+ * Uploads an image file as the request body (not as a form). The server checks the file's
+ * real type and size, stores it in Cloudflare R2, and answers with its public URL.
+ */
+export async function uploadImage(path, file) {
+  const token = getToken();
+  const headers = { 'Content-Type': file.type };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  let response;
+  try {
+    response = await fetch(BASE + path, { method: 'POST', headers: headers, body: file });
+  } catch {
+    throw new ApiError(0, 'Network error — is the API running?');
+  }
+
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+  if (response.status === 401 && token) {
+    onUnauthorized();
+  }
+  if (!response.ok) {
+    let message = `Upload failed (${response.status})`;
+    if (response.status === 413) {
+      message = 'That image is too large.';
+    } else if (data && data.error) {
+      message = data.error;
+    }
+    throw new ApiError(response.status, message);
+  }
+  return data;
+}

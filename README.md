@@ -44,4 +44,4 @@ See [DEPLOY.md](DEPLOY.md) for the step-by-step guide: MongoDB Atlas, then Rende
 
 ## Not built yet
 
-Promo codes and discounts (hook point in `services/pricing.js`, `Promotion` model exists), stock tracking, sales reports, image upload (products take an image URL), Socket.IO real-time updates, and an admin UI for managing staff accounts.
+Promo codes and discounts (hook point in `services/pricing.js`, `Promotion` model exists), stock tracking, sales reports, Socket.IO real-time updates, and an admin UI for managing staff accounts.
