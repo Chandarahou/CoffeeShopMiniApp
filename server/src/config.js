@@ -26,6 +26,19 @@ export const config = {
     .filter(Boolean),
   shopUtcOffsetMinutes: Number(process.env.SHOP_UTC_OFFSET_MINUTES ?? 0),
   allowDevAuth: process.env.ALLOW_DEV_AUTH === 'true' && env === 'development',
+  // Cloudflare R2, for product image uploads. Leave R2_BUCKET empty to turn uploads off;
+  // product images can still be set by pasting an image URL.
+  r2: {
+    accountId: process.env.R2_ACCOUNT_ID?.trim() ?? '',
+    accessKeyId: process.env.R2_ACCESS_KEY_ID?.trim() ?? '',
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY?.trim() ?? '',
+    bucket: process.env.R2_BUCKET?.trim() ?? '',
+    // Public address of the bucket, e.g. https://pub-xxxx.r2.dev or https://images.yourcafe.com
+    publicUrl: (process.env.R2_PUBLIC_URL?.trim() ?? '').replace(/\/+$/, ''),
+    // Only for testing against a local S3-compatible server; normally derived from the account ID
+    endpoint: process.env.R2_ENDPOINT?.trim() ?? '',
+    maxImageBytes: 1.5 * 1024 * 1024, // 1.5 MB
+  },
   // Bakong KHQR. Leave KHQR_BAKONG_ACCOUNT_ID empty to offer cash only.
   khqr: {
     accountId: process.env.KHQR_BAKONG_ACCOUNT_ID?.trim() ?? '', // e.g. yourname@aclb

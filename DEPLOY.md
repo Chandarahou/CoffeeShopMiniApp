@@ -53,6 +53,7 @@ It prints the database it changed. If it says it can't find the email, it lists 
    | `CORS_ORIGINS` | Leave empty for now (set in step 4) |
    | `KHQR_BAKONG_ACCOUNT_ID` | Your Bakong account ID, such as `yourname@aclb`. Leave empty to offer cash only. |
    | `KHQR_BAKONG_TOKEN` | Your Bakong Open API token. It confirms KHQR payments automatically. Leave empty and staff confirm them by hand. |
+   | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL` | Cloudflare R2 for product image uploads (see **Product images** below). Leave empty to paste image URLs instead. |
 
    `KHQR_MERCHANT_NAME` and `KHQR_MERCHANT_CITY` are prefilled. The merchant name appears in the customer's bank app and must be 25 characters or fewer. If the account ID is invalid, the server logs `[khqr] configuration rejected` and checkout offers cash only.
 
@@ -60,6 +61,16 @@ It prints the database it changed. If it says it can't find the email, it lists 
 3. When the deploy finishes, open `https://weeee-api.onrender.com/api/health`. It should show `{"ok":true}`.
 
 The blueprint uses the **free** plan. It sleeps after 15 minutes without traffic: the first request then takes about a minute, and the bot doesn't answer while it sleeps. That's fine for testing. For real customers, change `plan: free` to `plan: starter` in `render.yaml`, or change the plan in the dashboard.
+
+### Product images — Cloudflare R2 (optional)
+
+1. Cloudflare dashboard → **R2 Object Storage → Create bucket**, for example `weeee-images`.
+2. Open the bucket → **Settings → Public access**: turn on the **r2.dev subdomain** (or connect a custom domain). Copy the public address, such as `https://pub-xxxx.r2.dev`. This becomes `R2_PUBLIC_URL`.
+3. **R2 → Manage API tokens → Create API token**: permission **Object Read & Write**, applied to **this bucket only**. Copy the **Access Key ID** and **Secret Access Key** (the secret is shown only once).
+4. Your **Account ID** is shown on the R2 overview page.
+5. Put the five values in Render's Environment page. On restart the log should show `[r2] image uploads enabled`.
+
+Staff then get an **Images** page in the admin sidebar with an **Upload image** button (JPEG, PNG or WebP, up to 1.5 MB; no videos). After an upload, a pop-up shows the image's URL with a **Copy URL** button; paste it into the product's **Image URL** field and save. The server checks each file's real type, gives it a random name, and stores it in the bucket; customers load images straight from R2. The r2.dev address is rate-limited by Cloudflare and meant for light use; for a busy shop, connect a custom domain to the bucket.
 
 ## 3. Frontends — Cloudflare Pages (two projects)
 

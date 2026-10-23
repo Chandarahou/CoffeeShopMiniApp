@@ -40,3 +40,13 @@ services:
         value: Phnom Penh
       - key: KHQR_BAKONG_TOKEN
         sync: false # Bakong Open API token — confirms KHQR payments automatically
+      - key: R2_ACCOUNT_ID
+        sync: false # Cloudflare account ID (leave the R2 settings empty to turn uploads off)
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        sync: false
+      - key: R2_PUBLIC_URL
+        sync: false # e.g. https://pub-xxxx.r2.dev

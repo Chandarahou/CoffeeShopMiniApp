@@ -120,8 +120,9 @@ async function save() {
         <textarea v-model="form.description" class="input" rows="2" maxlength="1000" />
       </div>
       <div class="md:col-span-2">
-        <label class="label">Image URL</label>
-        <input v-model="form.imageUrl" type="url" class="input" placeholder="https://…" />
+        <label class="label" for="image-url">Image URL</label>
+        <input id="image-url" v-model="form.imageUrl" type="url" class="input" placeholder="https://…" />
+        <p class="mt-1 text-xs text-muted">Upload a photo on the <RouterLink to="/images" class="font-medium text-matcha">Images</RouterLink> page, then paste its URL here.</p>
       </div>
       <div>
         <label class="label">Category</label>
